@@ -1,0 +1,3 @@
+[submodule "songlist"]
+	path = songlist
+	url = git@github.com:lue-trim/songlist-reito.git
