@@ -1,6 +1,3 @@
 [submodule "songlist"]
 	path = songlist
 	url = git@github.com:lue-trim/songlist-reito.git
-[submodule "matsuri"]
-	path = matsuri
-	url = git@github.com:lue-trim/matsuri.icu.git
