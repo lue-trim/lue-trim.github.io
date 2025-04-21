@@ -2,20 +2,183 @@
 <html lang="zh-CN" xml:lang="zh-CN">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>卤鹅菌的主页</title>
-  <link rel="stylesheet"
-    href="https://cdn-font.hyperos.mi.com/font/css?family=MiSans:100,200,300,400,450,500,600,650,700,900:Chinese_Simplify,Latin&display=swap" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叽站</title>
+    <style>
+        ::selection {
+            background: #ff80ab80;
+            /* color: #000000; */
+        }
+        a {
+            padding: 10px;
+            color: #212529;
+            display: inline flex;
+            /* justify-content: center; */
+            /* margin: 10px 0; */
+            transition: .25s;
+            border-radius: 10px;
+            background: #ff80ab00;
+            text-decoration: none;
+        }
+        a:link{
+            /* color: #ff80ab; */
+            color: #212529;
+        }
+        a:visited {
+            color: #ff80ab;
+            color: #212529;
+        }
+        a:hover {
+            padding: 0, 10px;
+            background: #ff80ab60;
+            color: #212529;
+            /* text-decoration: none; */
+            border-radius: 10px;
+            /* margin: 10px 0; */
+        }
+        hr {
+            max-width: 800px;
+            border-top: 1px solid #ff80abc0;
+        }
+        body {
+            /* background-image: url(https://cdn.jsdelivr.net/gh/lue-trim/lue-trim.github.io/static/queen.jpg) ; */
+            background-image: url("static/wasehand.png");
+            /* background-repeat: no-repeat ; */
+            background-repeat: repeat;
+            background-size: auto;
+            background-attachment: fixed;
+            background-position-x: center;
+            background-color: #ffffffee;
+            /* backdrop-filter: blur(10px) ; */
+            margin: 0;
+            padding-top: 70px;
+            /* padding-bottom: 80px; */
+            /* opacity: 0.4; */
+        }
+        header {
+            background-color: #ffffff9e;
+            backdrop-filter: blur(20px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 70px;
+            z-index: 10;
+        }
+        footer {
+            background-color: #ffffff9e;
+            backdrop-filter: blur(20px);
+            position: relative;
+            bottom: 0;
+            margin: 0;
+            border: 0;
+            width: 100%;
+            height: 100px;
+            display: flow;
+        }
+        .block {
+            background-color: #ffffff80;
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .text {
+            margin: auto;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            align-content: center;
+            max-width: 960px;
+        }
+        button {
+            background-color: #ff80ab;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        @font-face {
+            font-family: "阿里巴巴普惠体 2.0 65 Medium";
+            font-weight: 400;
+            src: url("https://cdn.jsdelivr.net/gh/lue-trim/lue-trim.github.io@ebbf813446af15e2a32525b07fa4a9475dd3e3cb/static/font/mavXbyinldRm.woff2") format("woff2"),
+            url("https://cdn.jsdelivr.net/gh/lue-trim/lue-trim.github.io@ebbf813446af15e2a32525b07fa4a9475dd3e3cb/static/font/mavXbyinldRm.woff") format("woff");
+            
+        }
+        * {
+            font-family: "阿里巴巴普惠体 2.0 65 Medium"
+        }
+    </style>
 </head>
-
+<header>
+    <div class="text">
+        <a href="/index.html">主页</a>
+        <a href="/songlist/index.html">歌单</a>
+        <a href="/matsuri.icu">弹幕站</a>
+    </div>
+    <!-- <hr /> -->
+</header>
 <body>
-  <p><a href="/index.html">主页</a> <a href="/songlist/index.html">歌单</a> <a href="/matsuri.icu">麻酱弹幕站</a></p>
-  <hr />
-  <h1>卤鹅菌的主页</h1>
-  <p>集结各种各样的自己手搓的叽相关项目用的</p>
-  <hr />
+    <div class="text">
+        <div class="block">
+            <h1 class="text">叽站</h1>
+            <!-- <p class="text">集结各种各样的自己手搓的叽相关项目用的</p> -->
+            <div class="text">
+                <img style="max-width: 400px;" src="/static/wasehand.jpeg" alt="叽爪">
+            </div>
+        </div>
+    </div>
+    <div class="text">
+        <div class="block", style="display: flow">
+            <h2 class="text">一些神奇的小按钮</h2>
+            <button id="stop" style="display: none;">停止</button>
+            <button id="b1">喘气</button>
+            <button id="b2">你叽吧没了</button>
+        </div>
+    </div>
 
+    <script>
+        class audio {
+            constructor(button, audio) {
+                this.audio = audio;
+                this.button = button;
+            }
+        }
+
+        var audios = [];
+
+        function stopClick() {
+            for (i in audios) {
+                i.audio.pause();
+                i.audio.currentTime = 0;
+            }
+        }
+
+        function addAudio(buttonId, source) {
+            var but = document.getElementById(buttonId);
+            var aud = new Audio(source);
+            but.addEventListener('click', function () { aud.play(); });
+            audios.push(new audio(but, aud));
+        }
+
+        var stopButton = document.getElementById('stop');
+        stopButton.addEventListener('click', stopClick);
+
+        addAudio('b1', '/static/喘气.wav');
+        addAudio('b2', '/static/你叽吧没了.mp3');
+
+    </script>
 </body>
+<footer>
+    <hr style="margin:0; width:100%; max-width:100%;">
+    <div style="height:100%; display:block; align-content:center;">
+        <div align="center">Copyright(C)2025 lue-trim</div>
+        <div align="center">
+            <a href="//file.luetrim.top">文件站</a>
+            <a href="//rec.luetrim.top">录播站</a>
+        </div>
+    </div>
+</footer>
 
 </html>
