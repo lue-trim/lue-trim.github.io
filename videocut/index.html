@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AList视频剪辑任务管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @font-face {
+            font-family: "Alibaba Sans Regular";
+            font-weight: 400;
+            src: url("//luetrim-bucket.oss-rg-china-mainland.aliyuncs.com/font/AlibabaSans-Regular.woff2") format("woff2"),
+            url("//luetrim-bucket.oss-rg-china-mainland.aliyuncs.com/font/AlibabaSans-Regular.woff") format("woff");
+            
+        }
+
+        body {
+            font-family: "Alibaba Sans Regular", sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        } */
+        header {
+            background-color: #ffffff9e;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 10px 15px -3px rgb(0 0 0 / 0.09), 
+                0 4px 6px -4px rgb(0 0 0 / 0.1);
+            position: relative;
+            margin-bottom: 15px;
+            top: 0;
+            width: 100%;
+            height: 70px;
+            align-content: center;
+            z-index: 10;
+        }
+
+        .header-container {
+            margin: 10px;
+            /* margin-top: 10px;
+            margin-bottom: 10px; */
+            align-content: center;
+            display: flex;
+            justify-content: space-between;
+            /* max-width: 960px; */
+        }
+
+        footer {
+            background-color: #ffffff9e;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 10px 15px -3px rgb(0 0 0 / 0.09), 
+                0 4px 6px -4px rgb(0 0 0 / 0.1);
+            position: relative;
+            bottom: 0;
+            margin: 0;
+            border: 0;
+            width: 100%;
+            height: 100px;
+            display: flow;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 50px auto;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        .logout-btn {
+            background-color: #dc3545;
+            margin: 5px;
+        }
+        
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .dashboard {
+            display: none;
+        }
+        
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .file-browser {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+            height: 600px;
+            overflow-y: auto;
+        }
+        
+        .task-panel {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        .history-panel {
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        .file-list {
+            list-style: none;
+        }
+        
+        .file-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .folder-icon {
+            margin-right: 8px;
+            color: #ffc107;
+        }
+        
+        .file-icon {
+            margin-right: 8px;
+            color: #007bff;
+        }
+        
+        .video-icon {
+            margin-right: 8px;
+            color: #28a745;
+        }
+        
+        .path-controls {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .current-path {
+            flex-grow: 1;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .task-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .form-row {
+            grid-column: span 2;
+        }
+        
+        .form-half {
+            grid-column: span 1;
+        }
+        
+        .btn-submit {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+        
+        .task-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .task-history-table th,
+        .task-history-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .task-history-table th {
+            background-color: #f8f9fa;
+        }
+        
+        .status-queued {
+            color: #007bff;
+        }
+        
+        .status-success {
+            color: #28a745;
+        }
+        
+        .status-failed {
+            color: #dc3545;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-action {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .btn-refresh {
+            margin-top: 15px;
+            background-color: #17a2b8;
+        }
+        
+        .btn-refresh:hover {
+            background-color: #138496;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8d7da;
+            border-radius: 4px;
+        }
+        
+        .success-message {
+            color: #155724;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #d4edda;
+            border-radius: 4px;
+        }
+    </style>
+    <link rel="icon" type="image/png" href="/favicon.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-container">
+                <h1>AList视频剪辑任务管理</h1>
+                <div id="user-info" style="display: none;align-items: center;">
+                    <span>欢迎, <span id="username"></span></span>
+                    <button class="logout-btn" id="logout-btn">退出登录</button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 登录组件 -->
+        <div id="login-container" class="login-container">
+            <h2>使用AList账号登录</h2>
+            <div class="form-group">
+                <label for="username-input">用户名:</label>
+                <input type="text" id="username-input" placeholder="Alist 用户名">
+            </div>
+            <div class="form-group">
+                <label for="password-input">密码:</label>
+                <input type="password" id="password-input" placeholder="Alist 密码">
+            </div>
+            <button id="login-btn">登录</button>
+            <div id="login-error" class="error-message" style="display: none;"></div>
+        </div>
+        
+        <!-- 主控制面板 -->
+        <div id="dashboard" class="dashboard">
+            <div class="main-layout">
+                <!-- 文件浏览器 -->
+                <div class="file-browser">
+                    <div class="path-controls">
+                        <button id="go-back-btn" style="margin-right: 10px;">← 返回上级</button>
+                        <div class="current-path" id="current-path">/</div>
+                    </div>
+                    <ul class="file-list" id="file-list">
+                        <!-- 文件列表将动态加载 -->
+                    </ul>
+                </div>
+                
+                <!-- 任务提交面板 -->
+                <div class="task-panel">
+                    <h2>添加剪辑任务</h2>
+                    <form class="task-form" id="task-form">
+                        <div class="form-row">
+                            <label for="source-path">源文件路径:</label>
+                            <input type="text" id="source-path" placeholder="点击左侧文件自动填充">
+                        </div>
+                        <div class="form-half">
+                            <label for="start-time">开始时间 (秒):</label>
+                            <input type="number" id="start-time" min="0" step="0.1" value="0">
+                        </div>
+                        <div class="form-half">
+                            <label for="end-time">结束时间 (秒):</label>
+                            <input type="number" id="end-time" min="0" step="0.1" value="10">
+                        </div>
+                        <div class="form-row">
+                            <label for="output-name">输出文件名:</label>
+                            <input type="text" id="output-name" placeholder="不含后缀, xml与视频都以此命名">
+                        </div>
+                        <div class="form-row">
+                            <button type="submit" class="btn-submit">提交剪辑任务</button>
+                        </div>
+                    </form>
+                    <div id="task-message" class="success-message" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <!-- 历史任务面板 -->
+            <div class="history-panel">
+                <h2>历史任务</h2>
+                <button id="refresh-history" class="btn-refresh">手动刷新</button>
+                <table class="task-history-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>提交时间</th>
+                            <th>源文件</th>
+                            <th>输出文件</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody">
+                        <!-- 历史任务将动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div>
+            <a 
+        </div>
+    </div>
+
+    <script>
+        // 配置信息
+        const CONFIG = {
+            alistUrl: 'https://nas.luetrim.top',
+            apiUrl: 'https://matsuri.luetrim.top/videocut'
+        };
+
+        // 获取哈希密码
+        async function getHashPassword(password) {
+            const suffix = '-https://github.com/alist-org/alist';
+            const fullPassword = password + suffix;
+
+            // 将字符串编码为 UTF-8 字节数组
+            const encoder = new TextEncoder();
+            const data = encoder.encode(fullPassword);
+
+            // 使用 Web Crypto API 计算 SHA-256 哈希
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+
+            // 将 ArrayBuffer 转换为十六进制字符串
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            // console.debug(hashHex)
+
+            return hashHex;
+        }
+
+        // 存储当前路径
+        let currentPath = '/';
+        
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查本地token
+            checkLocalToken();
+            
+            // 绑定事件
+            bindEvents();
+        });
+
+        // 检查本地token
+        async function checkLocalToken() {
+            const token = localStorage.getItem('alist_token');
+            if (!token) {
+                showLogin();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${CONFIG.alistUrl}/api/me`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': token
+                    }
+                });
+                
+                if (response.status === 200) {
+                    const data = await response.json();
+                    showDashboard(data.data.username || 'User');
+                } else {
+                    localStorage.removeItem('alist_token');
+                    showLogin();
+                    showError('验证失败，请重新登录');
+                }
+            } catch (error) {
+                console.error('Token验证失败:', error);
+                localStorage.removeItem('alist_token');
+                showLogin();
+                showError('网络错误，请稍后重试');
+            }
+        }
+
+        // 显示登录组件
+        function showLogin() {
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('user-info').style.display = 'none';
+        }
+
+        // 显示主控制面板
+        function showDashboard(username) {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('user-info').style.display = 'flex';
+            document.getElementById('username').textContent = username;
+            
+            // 加载初始文件列表
+            loadFileList(currentPath);
+        }
+
+        // 绑定事件
+        function bindEvents() {
+            // 登录事件
+            document.getElementById('login-btn').addEventListener('click', handleLogin);
+            
+            // 退出登录事件
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
+            
+            // 提交任务事件
+            document.getElementById('task-form').addEventListener('submit', handleSubmitTask);
+            
+            // 返回上级事件
+            document.getElementById('go-back-btn').addEventListener('click', goBack);
+            
+            // 刷新历史事件
+            document.getElementById('refresh-history').addEventListener('click', loadHistory);
+        }
+
+        // 处理登录
+        async function handleLogin() {
+            const username = document.getElementById('username-input').value.trim();
+            const password = document.getElementById('password-input').value.trim();
+            
+            if (!username || !password) {
+                showError('请输入用户名和密码');
+                return;
+            }
+            
+            try {
+                const hashPassword = await getHashPassword(password);
+                
+                // 获取token
+                var response = await fetch(`${CONFIG.alistUrl}/api/auth/login/hash`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: hashPassword
+                    })
+                });
+                var data = await response.json();
+
+                if (data.code === 200) {
+                    const token = data.data.token;
+                    localStorage.setItem('alist_token', token);
+                    hideError();
+                    // 获取用户名
+                    var response = await fetch(`${CONFIG.alistUrl}/api/me`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': token
+                        }
+                    });
+                    var data = await response.json();
+                    showDashboard(data.data.username || username);
+                } else {
+                    showError(data.message || '登录失败');
+                }
+            } catch (error) {
+                console.error('登录错误:', error);
+                showError('网络错误，请稍后重试');
+            }
+        }
+
+        // 处理退出登录
+        function handleLogout() {
+            localStorage.removeItem('alist_token');
+            showLogin();
+        }
+
+        // 获取对应的本地目录
+        async function setLocalPath(currentPath, videoName) {
+            const token = localStorage.getItem('alist_token');
+            const path = joinPaths(currentPath, videoName);
+            const response = await fetch(`${CONFIG.alistUrl}/api/fs/get`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        path: path,
+                        password: "",
+                    })
+                });
+            const data = await response.json();
+            const localPath = data.data.path;
+            // return localPath;
+            const startTime = parseFloat(document.getElementById('start-time').value);
+            const endTime = parseFloat(document.getElementById('end-time').value);
+            document.getElementById('source-path').value = localPath;
+            document.getElementById('output-name').value = `${videoName}-${startTime}-${endTime}`
+        }
+
+        // 加载文件列表
+        async function loadFileList(path) {
+            const token = localStorage.getItem('alist_token');
+            if (!token) return;
+            
+            try {
+                const response = await fetch(`${CONFIG.alistUrl}/api/fs/list`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        path: path,
+                        password: "",
+                        page_num: 1,
+                        page_size: 100
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.code === 200) {
+                    currentPath = path;
+                    document.getElementById('current-path').textContent = path;
+                    
+                    const fileList = document.getElementById('file-list');
+                    fileList.innerHTML = '';
+                    
+                    // 添加返回上级选项（如果不是根目录）
+                    if (path !== '/') {
+                        const backItem = document.createElement('li');
+                        backItem.className = 'file-item';
+                        backItem.innerHTML = '<span class="folder-icon">📁</span> .. (返回上级)';
+                        backItem.onclick = () => goBack();
+                        fileList.appendChild(backItem);
+                    }
+                    
+                    // 渲染文件列表
+                    const fileContent = data.data.content === null ? [] : data.data.content;
+                    fileContent.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'file-item';
+                        
+                        if (item.is_dir) {
+                            li.innerHTML = `<span class="folder-icon">📁</span> ${item.name}`;
+                            li.onclick = () => loadFileList(joinPaths(currentPath, item.name));
+                        } else {
+                            // 检查是否为视频文件
+                            const lowerName = item.name.toLowerCase();
+                            let icon = '📄'; // 默认文件图标
+                            
+                            if (lowerName.endsWith('.mp4') || lowerName.endsWith('.flv')) {
+                                icon = '🎬'; // 视频文件图标
+                                li.onclick = () => setLocalPath(currentPath, item.name);
+                            } else {
+                                li.onclick = () => {
+                                    alert('此功能仅支持MP4和FLV文件');
+                                };
+                            }
+                            
+                            li.innerHTML = `<span class="file-icon">${icon}</span> ${item.name}`;
+                        }
+                        
+                        fileList.appendChild(li);
+                    });
+                } else {
+                    showError(data.message || '获取文件列表失败');
+                }
+            } catch (error) {
+                console.error('加载文件列表错误:', error);
+                showError('网络错误，请稍后重试');
+            }
+        }
+
+        // 跳转到上级目录
+        function goBack() {
+            if (currentPath === '/') return;
+            
+            const pathParts = currentPath.split('/').filter(p => p);
+            if (pathParts.length > 0) {
+                pathParts.pop();
+                const newPath = '/' + pathParts.join('/');
+                loadFileList(newPath || '/');
+            }
+        }
+
+        // 拼接路径
+        function joinPaths(base, relative) {
+            if (base === '/') return base + relative;
+            return base + '/' + relative;
+        }
+
+        // 提交剪辑任务
+        async function handleSubmitTask(e) {
+            e.preventDefault();
+            
+            const sourcePath = document.getElementById('source-path').value.trim();
+            const startTime = parseFloat(document.getElementById('start-time').value);
+            const endTime = parseFloat(document.getElementById('end-time').value);
+            const outputName = document.getElementById('output-name').value.trim();
+
+            if (!sourcePath || isNaN(startTime) || isNaN(endTime) || !outputName) {
+                showError('请填写所有字段');
+                return;
+            }
+            
+            if (startTime >= endTime) {
+                showError('结束时间必须大于开始时间');
+                return;
+            }
+                        
+            try {
+                const response = await fetch(`${CONFIG.apiUrl}/tasks`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        source_path: sourcePath,
+                        start_time: startTime,
+                        end_time: endTime,
+                        output_name: outputName
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage('任务提交成功！');
+                    document.getElementById('task-form').reset();
+                    document.getElementById('source-path').value = '';
+                    loadHistory(); // 刷新历史记录
+                } else {
+                    showError(data.detail || '提交任务失败');
+                }
+            } catch (error) {
+                console.error('提交任务错误:', error);
+                showError('网络错误，请稍后重试');
+            }
+        }
+
+        // 加载历史任务
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${CONFIG.apiUrl}/tasks`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const tbody = document.getElementById('history-tbody');
+                    tbody.innerHTML = '';
+                    
+                    data.tasks.forEach(task => {
+                        const row = document.createElement('tr');
+                        
+                        // 状态颜色
+                        let statusClass = '';
+                        let statusText = task.status;
+                        switch(task.status) {
+                            case 'queued':
+                                statusClass = 'status-queued';
+                                statusText = '排队中';
+                                break;
+                            case 'working':
+                                statusClass = 'status-queued';
+                                statusText = '处理中';
+                                break;
+                            case 'success':
+                                statusClass = 'status-success';
+                                statusText = '成功';
+                                break;
+                            case 'failed':
+                                statusClass = 'status-failed';
+                                statusText = '失败';
+                                break;
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${task.id}</td>
+                            <td>${task.time}</td>
+                            <td>${task.source_path}</td>
+                            <td>${task.output_name}</td>
+                            <td>${task.start_time}s</td>
+                            <td>${task.end_time}s</td>
+                            <td><span class="${statusClass}">${statusText}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action" onclick="deleteTask('${task.id}')">取消</button>
+                                    <button class="btn-action" onclick="resubmitTask(${JSON.stringify(task).replace(/"/g, '&quot;')})">重新提交</button>
+                                </div>
+                            </td>
+                        `;
+                        
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    showError('获取历史任务失败:' + data.detail);
+                }
+            } catch (error) {
+                console.error('加载历史错误:', error);
+                showError('网络错误，请稍后重试');
+            }
+        }
+
+        // 取消任务
+        async function deleteTask(taskId) {
+            if (!confirm('确定要把此任务提前取消吗？（正在进行中的任务不能中止）')) return;
+            
+            try {
+                const response = await fetch(`${CONFIG.apiUrl}/tasks/${taskId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    loadHistory(); // 刷新历史记录
+                } else {
+                    showError('取消任务失败:' + data.detail);
+                }
+            } catch (error) {
+                console.error('删除任务错误:', error);
+                showError('网络错误，请稍后重试');
+            }
+        }
+
+        // 重新提交任务
+        function resubmitTask(task) {
+            document.getElementById('source-path').value = task.source_path;
+            document.getElementById('start-time').value = task.start_time;
+            document.getElementById('end-time').value = task.end_time;
+            document.getElementById('output-name').value = task.output_name;
+            
+            // 滚动到表单顶部
+            document.querySelector('.task-panel').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            alert(message);
+            // const errorDiv = document.getElementById('login-error');
+            // errorDiv.textContent = message;
+            // errorDiv.style.display = 'block';
+        }
+
+        // 隐藏错误信息
+        function hideError() {
+            document.getElementById('login-error').style.display = 'none';
+        }
+
+        // 显示成功信息
+        function showMessage(message) {
+            alert(message);
+            // const msgDiv = document.getElementById('task-message');
+            // msgDiv.textContent = message;
+            // msgDiv.style.display = 'block';
+            
+            // setTimeout(() => {
+            //     msgDiv.style.display = 'none';
+            // }, 3000);
+        }
+
+        // 全局函数供HTML调用
+        window.deleteTask = deleteTask;
+        window.resubmitTask = resubmitTask;
+    </script>
+</body>
+<footer>
+    <hr style="margin:0; width:100%; max-width:100%;">
+    <div style="height:100%; display:block; align-content:center;">
+        <div align="center">
+            <a href="//beian.miit.gov.cn">桂ICP备2025066596号</a>
+        </div>
+        <div align="center">Copyright(C)2026 lue-trim</div>
+    </div>
+</footer>
+</html>
